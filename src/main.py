@@ -5,7 +5,6 @@ from AI_levels.AILevel1 import AIPlayerLevel1
 from AI_levels.AILevel2 import AIPlayerLevel2
 
 
-
 eel.init('web')
 
 player1 = Player("Player", 10000)

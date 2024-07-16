@@ -20,7 +20,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from Player import Player
 
 class PokerGame:
-    def __init__(self, players):
+    def __init__(self, players, big):
         self.deck = Deck()
         self.players = players
         self.community_cards = []
@@ -33,7 +33,7 @@ class PokerGame:
         self.is_showdown = False 
         self.current_dealer = 1  
         self.small_blind = 50
-        self.big_blind = 100
+        self.big_blind = big
         self.log = []
         self.all_in_announcement = ""
         self.reset_game()
@@ -452,11 +452,11 @@ class PokerGame:
         game_state["player1"]["preflop_odds"] = self.get_preflop_odds(card1.rank.value, card2.rank.value)
         return game_state
 
-# def main():
-#     player1 = Player("Alice", 10000)
-#     player2 = Player("Bob", 10000)
-#     game = PokerGame([player1, player2], big = 100)
-#     game.play_round()
+def main():
+    player1 = Player("Alice", 10000)
+    player2 = Player("Bob", 10000)
+    game = PokerGame([player1, player2], big = 100)
+    game.play_round()
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
