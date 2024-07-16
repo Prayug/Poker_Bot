@@ -298,6 +298,8 @@ class PokerGame:
             
             if self.players[1].make_decision_pre() == "Call":
                 self.ai_call(self.players[1])
+            elif self.players[1].make_decision_pre() == "Raise":
+                self.player_raise(self.players[1], 3 * self.big_blind)
             else:
                 self.players[1].fold_hand()
                 self.players[0].chips += self.pot
