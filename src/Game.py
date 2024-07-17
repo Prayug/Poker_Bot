@@ -77,11 +77,10 @@ class PokerGame:
 
     def simulate_game_postFlop(self, bot_hand, flop_cards):
         bot_wins = 0
-        newGame = PokerGame([Player("Alice", 10000), Player("Bob", 10000)])  # Temporary game instance for simulation
+        newGame = PokerGame([Player("Alice", 10000), Player("Bob", 10000)], big = 100)  # Temporary game instance for simulation
 
         for _ in range(1000):
             newGame.reset_game()
-            print(len(newGame.deck.cards))
 
             newGame.players[0].hand = [bot_hand[0], bot_hand[1]]
             newGame.deck.remove(bot_hand[0])
@@ -103,11 +102,11 @@ class PokerGame:
             if newGame.showdown() == newGame.players[0]:
                 bot_wins += 1
 
-        return (bot_wins / 100) * 100
+        return (bot_wins / 1000) * 100
 
     def simulate_game_postTurn(self, bot_hand, comm_cards):
         bot_wins = 0
-        newGame = PokerGame([Player("Alice", 10000), Player("Bob", 10000)])  # Temporary game instance for simulation
+        newGame = PokerGame([Player("Alice", 10000), Player("Bob", 10000)], big = 100)  # Temporary game instance for simulation
 
         for _ in range(1000):
             newGame.reset_game()
@@ -128,7 +127,7 @@ class PokerGame:
             if newGame.showdown() == newGame.players[0]:
                 bot_wins += 1
 
-        return (bot_wins / 100) * 100
+        return (bot_wins / 1000) * 100
 
     def make_decision_flop(self, bot_hand, flop_cards):        
         hand_strength = self.simulate_game_postFlop(bot_hand, flop_cards)
@@ -411,7 +410,9 @@ class PokerGame:
                 else:
                     self.players[1].fold_hand()
             else:
-                if ai_player.make_decision_pre() == "Call":
+                if ai_player.make_decision_pre() == "Raise":
+                    self.player_raise(ai_player, 3 * self.big_blind)
+                elif ai_player.make_decision_pre() == "Call":
                     call_amount = min(self.highest_bet, ai_player.chips)
                     ai_player.current_bet = call_amount
                     ai_player.chips -= call_amount
