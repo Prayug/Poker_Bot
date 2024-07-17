@@ -40,6 +40,7 @@ class PokerGame:
         self.ai_player = next((p for p in players if isinstance(p, AIPlayerLevel2)), None)
         self.create_hands_table()
         self.counter = 0
+        self.player1Response = ""
 
     def create_hands_table(self):
         with sqlite3.connect('poker_odds.db') as conn:
@@ -129,7 +130,7 @@ class PokerGame:
 
         return (bot_wins / 1000) * 100
 
-    def make_decision_flop(self, bot_hand, flop_cards):        
+    def make_decision_flop(self, bot_hand, flop_cards, player1Resp):        
         hand_strength = self.simulate_game_postFlop(bot_hand, flop_cards)
 
         print(hand_strength)
@@ -137,7 +138,10 @@ class PokerGame:
         # Decision threshold based on win rate
         call_threshold = 50  # Example threshold, can be adjusted
 
-        if hand_strength >= call_threshold:
+        if player1Resp == "Raise":
+            if hand_strength >= call_threshold + 5:
+                return "Call"
+        if player1Resp == "Check":
             return "Call"
         return "Fold"  # AI folds if the hand strength is below the threshold
     
@@ -277,6 +281,9 @@ class PokerGame:
                 self.pot += (self.big_blind - self.small_blind)
                 self.players[1].current_bet = self.big_blind
 
+            if self.river_dealt:
+                
+
             self.advance_game_stage()
 
         elif player_action == "raise" and raise_amount is not None:
@@ -296,7 +303,7 @@ class PokerGame:
             self.player_raise(self.players[0], raise_amount)
             
             if self.players[1].make_decision_pre() == "Call":
-                self.ai_call(self.players[1])
+                self.ai_call(self.players[1], player_action)
             elif self.players[1].make_decision_pre() == "Raise":
                 self.player_raise(self.players[1], 3 * self.big_blind)
             else:
@@ -383,7 +390,7 @@ class PokerGame:
         return raise_amount
 
 
-    def ai_call(self, ai_player):
+    def ai_call(self, ai_player, player_action):
         if isinstance(ai_player, AIPlayerLevel1):
             call_amount = min(self.highest_bet, ai_player.chips)
             ai_player.current_bet = call_amount
@@ -401,7 +408,7 @@ class PokerGame:
                 else:
                     self.players[1].fold_hand()
             elif self.flop_dealt:
-                if self.make_decision_flop(self.players[1].hand, self.community_cards) == "Call":
+                if self.make_decision_flop(self.players[1].hand, self.community_cards, player1Resp) == "Call":
                     call_amount = min(self.highest_bet, ai_player.chips)
                     ai_player.current_bet = call_amount
                     ai_player.chips -= call_amount
