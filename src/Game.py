@@ -282,7 +282,7 @@ class PokerGame:
                 self.players[1].current_bet = self.big_blind
 
             if self.river_dealt:
-                
+                print("here")
 
             self.advance_game_stage()
 
@@ -408,7 +408,7 @@ class PokerGame:
                 else:
                     self.players[1].fold_hand()
             elif self.flop_dealt:
-                if self.make_decision_flop(self.players[1].hand, self.community_cards, player1Resp) == "Call":
+                if self.make_decision_flop(self.players[1].hand, self.community_cards, player_action) == "Call":
                     call_amount = min(self.highest_bet, ai_player.chips)
                     ai_player.current_bet = call_amount
                     ai_player.chips -= call_amount
