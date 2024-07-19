@@ -283,6 +283,10 @@ class PokerGame:
 
             if self.river_dealt:
                 print("here")
+            elif self.turn_dealt:
+                print("monk")
+            elif self.flop_dealt:
+                print("ey")
 
             self.advance_game_stage()
 
