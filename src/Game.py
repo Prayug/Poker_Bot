@@ -287,11 +287,22 @@ class PokerGame:
                 print("monk")
             elif self.flop_dealt:
                 print("ey")
-
+            else:
+                if self.players[1].make_decision_pre() == "Raise":
+                    print("Pre Raise")
+                    self.player_raise(self.players[1], 3*self.big_blind)
+                
             self.advance_game_stage()
 
         elif player_action == "raise" and raise_amount is not None:
             
+            if self.river_dealt:
+                print("here")
+            elif self.turn_dealt:
+                print("monk")
+            elif self.flop_dealt:
+                print("ey")
+
             raise_amount = int(raise_amount)
             
             if not self.flop_dealt and self.players[0].current_bet == self.small_blind:
