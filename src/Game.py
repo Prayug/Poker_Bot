@@ -290,7 +290,13 @@ class PokerGame:
             else:
                 if self.players[1].make_decision_pre() == "Raise":
                     print("Pre Raise")
+                    print(self.pot)
                     self.player_raise(self.players[1], 3*self.big_blind)
+                    print("raised")
+                    print(self.pot)
+
+                return "ai_raised"
+
                 
             self.advance_game_stage()
 
@@ -321,6 +327,7 @@ class PokerGame:
                 self.ai_call(self.players[1], player_action)
             elif self.players[1].make_decision_pre() == "Raise":
                 self.player_raise(self.players[1], 3 * self.big_blind)
+                return "ai_raised"
             else:
                 self.players[1].fold_hand()
                 self.players[0].chips += self.pot

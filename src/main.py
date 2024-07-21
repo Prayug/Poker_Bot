@@ -37,11 +37,16 @@ def get_best_hand():
 
 @eel.expose
 def collect_bets(action, raise_amount=None):
+    result = None
     if action == "check":
-        game.collect_bets(action)
+        result = game.collect_bets(action)
     elif action == "raise" and raise_amount is not None:
-        game.collect_bets(action, raise_amount)
-    return game.get_game_state()
+        result = game.collect_bets(action, raise_amount)
+
+    if result == "ai_raised":
+        return {"state": game.get_game_state(), "ai_raised": True}
+    
+    return {"state": game.get_game_state(), "ai_raised": False}
 
 @eel.expose
 def deal_community_cards(number):
