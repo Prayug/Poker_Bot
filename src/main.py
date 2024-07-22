@@ -53,6 +53,7 @@ def deal_community_cards(number):
     game.deal_community_cards(number)
     return game.get_game_state()
 
+
 @eel.expose
 def showdown():
     game.showdown()
