@@ -184,7 +184,7 @@ class PokerGame:
                 "hand": [get_card_image_path(card) for card in self.players[0].hand],
                 "best_hand": player1_hand_type,
                 "isFold": self.players[0].fold,
-                "isRaise": self.players[1]
+                "isRaise": self.players[1].isRaise
 
             },
             "player2": {
@@ -192,7 +192,7 @@ class PokerGame:
                 "chips": self.players[1].chips,
                 "hand": [get_card_image_path(card) for card in self.players[1].hand] if self.is_showdown or self.players[1].fold else ["cards/back.png" for card in self.players[1].hand],
                 "isFold": self.players[1].fold,
-                "isRaise": self.players[1]
+                "isRaise": self.players[1].isRaise
             },
             "community_cards": [get_card_image_path(card) for card in self.community_cards],
             "pot": self.pot,

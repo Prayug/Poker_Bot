@@ -39,10 +39,14 @@ def get_best_hand():
 def collect_bets(action, raise_amount=None):
     result = None
     if action == "check":
+        print("Collecting check")
         result = game.collect_bets(action)
+
         if result["player2"]["isRaise"]:
+            print("ai raises")
             return {"state": game.get_game_state(), "ai_raised": True}            
     elif action == "raise" and raise_amount is not None:
+        print("Collecting raise")
         result = game.collect_bets(action, raise_amount)
     
     return {"state": game.get_game_state(), "ai_raised": False}
