@@ -40,11 +40,10 @@ def collect_bets(action, raise_amount=None):
     result = None
     if action == "check":
         result = game.collect_bets(action)
+        if result["player2"]["isRaise"]:
+            return {"state": game.get_game_state(), "ai_raised": True}            
     elif action == "raise" and raise_amount is not None:
         result = game.collect_bets(action, raise_amount)
-
-    if result == "ai_raised":
-        return {"state": game.get_game_state(), "ai_raised": True}
     
     return {"state": game.get_game_state(), "ai_raised": False}
 

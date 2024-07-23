@@ -7,6 +7,7 @@ class Player:
         self.hand = []  
         self.fold = False
         self.current_bet = 0
+        self.isRaise = False
 
 
     def setCards(self, card):
@@ -34,6 +35,7 @@ class Player:
         return self.bet(call_amount)
     
     def raise_bet(self, raise_amount):
+        self.isRaise = True
         total_bet = raise_amount
         return self.bet(total_bet)
     

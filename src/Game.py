@@ -87,7 +87,6 @@ class PokerGame:
             newGame.deck.remove(bot_hand[0])
             newGame.deck.remove(bot_hand[1])
 
-
             newGame.community_cards.append(flop_cards[0])
             newGame.deck.remove(flop_cards[0])
             newGame.community_cards.append(flop_cards[1])
@@ -142,6 +141,9 @@ class PokerGame:
             if hand_strength >= call_threshold + 5:
                 return "Call"
         if player1Resp == "Check":
+            if hand_strength >= call_threshold + 5:
+                self.players[1].isRaise = True
+                return "Raise"
             return "Call"
         return "Fold"  # AI folds if the hand strength is below the threshold
     
@@ -181,13 +183,16 @@ class PokerGame:
                 "chips": self.players[0].chips,
                 "hand": [get_card_image_path(card) for card in self.players[0].hand],
                 "best_hand": player1_hand_type,
-                "isFold": self.players[0].fold
+                "isFold": self.players[0].fold,
+                "isRaise": self.players[1]
+
             },
             "player2": {
                 "name": self.players[1].name,
                 "chips": self.players[1].chips,
                 "hand": [get_card_image_path(card) for card in self.players[1].hand] if self.is_showdown or self.players[1].fold else ["cards/back.png" for card in self.players[1].hand],
-                "isFold": self.players[1].fold
+                "isFold": self.players[1].fold,
+                "isRaise": self.players[1]
             },
             "community_cards": [get_card_image_path(card) for card in self.community_cards],
             "pot": self.pot,
@@ -207,16 +212,24 @@ class PokerGame:
     
 
     def advance_game_stage(self):
+        print("advancing to next state")
         if not self.flop_dealt:
+            print("dealing flop")
             self.deal_community_cards(3)
             self.flop_dealt = True
+            print("finish dealing flop")
         elif not self.turn_dealt:
+            print("dealing turn")
             self.deal_community_cards(1)
             self.turn_dealt = True
+            print("finish dealing turn")
         elif not self.river_dealt:
+            print("dealing river")
             self.deal_community_cards(1)
             self.river_dealt = True
+            print("finish dealing river")
         else:
+            print("skipping")
             if self.winner_paid == False:
                 self.showdown()
 
@@ -275,39 +288,56 @@ class PokerGame:
                 self.players[0].chips -= (self.big_blind - self.small_blind)
                 self.pot += (self.big_blind - self.small_blind)
                 self.players[0].current_bet = self.big_blind
-            
+
             if not self.flop_dealt and self.players[1].current_bet == self.small_blind:
                 self.players[1].chips -= (self.big_blind - self.small_blind)
                 self.pot += (self.big_blind - self.small_blind)
                 self.players[1].current_bet = self.big_blind
 
             if self.river_dealt:
-                print("here")
+                print("check on river")
+                self.showdown()
             elif self.turn_dealt:
-                print("monk")
+                print("check on turn")
+                self.advance_game_stage()
             elif self.flop_dealt:
-                print("ey")
+                print("check on flop")
+                ai_decision = self.make_decision_flop(self.players[1].hand, self.community_cards, "Check")
+                if ai_decision == "Raise":
+                    self.players[1].isRaise = True
+                    self.player_raise(self.players[1], 3 * self.big_blind)
+                    self.log.append("AI raises.")
+                else:
+                    self.log.append("AI checks.")
+                    self.advance_game_stage()
+                    
+                return self.get_game_state()            
             else:
+                print("check preflop")
                 if self.players[1].make_decision_pre() == "Raise":
-                    print("Pre Raise")
-                    print(self.pot)
+                    print("AI wants to raise")
+                    self.players[1].isRaise = True
                     self.player_raise(self.players[1], 3*self.big_blind)
-                    print("raised")
-                    print(self.pot)
+                elif self.players[1].make_decision_pre() == "Call":
+                    print("AI wants to call")
+                else:
+                    self.advance_game_stage()
+                    print("AI wants to fold")
 
-                return "ai_raised"
-
+                return self.get_game_state()
                 
             self.advance_game_stage()
 
         elif player_action == "raise" and raise_amount is not None:
             
             if self.river_dealt:
-                print("here")
+                print("raise on river")
             elif self.turn_dealt:
-                print("monk")
+                print("raise on turn")
             elif self.flop_dealt:
-                print("ey")
+                print("raise on flop")
+            else:
+                print("raise preflop")
 
             raise_amount = int(raise_amount)
             
@@ -326,8 +356,9 @@ class PokerGame:
             if self.players[1].make_decision_pre() == "Call":
                 self.ai_call(self.players[1], player_action)
             elif self.players[1].make_decision_pre() == "Raise":
+                self.players[1].isRaise = True
                 self.player_raise(self.players[1], 3 * self.big_blind)
-                return "ai_raised"
+                return self.get_game_state()
             else:
                 self.players[1].fold_hand()
                 self.players[0].chips += self.pot

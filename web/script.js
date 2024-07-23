@@ -57,7 +57,15 @@ async function collectBets(action, raise_amount = null) {
             updateUI(response);
             showMessage("Check");
 
-            if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
+            if (response.player2.isFold == false) {
+                if (response.player2.isRaise == true) {
+                    showMessage("AI raises.");
+                } else {
+                    showMessage("AI checks.");
+                }
+                updateUI(response);
+            } else {
+                showMessage("AI folded. You win the round.");
                 enableButton("play-next-round-button");
             }
         }
