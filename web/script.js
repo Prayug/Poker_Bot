@@ -57,15 +57,7 @@ async function collectBets(action, raise_amount = null) {
             updateUI(response);
             showMessage("Check");
 
-            if (response.player2.isFold == false) {
-                if (response.player2.isRaise == true) {
-                    showMessage("AI raises.");
-                } else {
-                    showMessage("AI checks.");
-                }
-                updateUI(response);
-            } else {
-                showMessage("AI folded. You win the round.");
+            if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
                 enableButton("play-next-round-button");
             }
         }
@@ -248,4 +240,3 @@ function updateBestHand(response) {
         player1BestHandElement.innerText = `Best Hand: ${response.player1.best_hand}`;
     }
 }
-

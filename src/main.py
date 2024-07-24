@@ -3,7 +3,7 @@ from Player import Player
 from Game import PokerGame
 from AI_levels.AILevel1 import AIPlayerLevel1
 from AI_levels.AILevel2 import AIPlayerLevel2
-# /opt/homebrew/bin/python3 /Users/prayugsigdel/Coding/Poker/Poker_Bot/src/Main.py
+
 
 eel.init('web')
 
@@ -37,25 +37,16 @@ def get_best_hand():
 
 @eel.expose
 def collect_bets(action, raise_amount=None):
-    result = None
     if action == "check":
-        print("Collecting check")
-        result = game.collect_bets(action)
-
-        if result["player2"]["isRaise"]:
-            print("ai raises")
-            return {"state": game.get_game_state(), "ai_raised": True}            
+        game.collect_bets(action)
     elif action == "raise" and raise_amount is not None:
-        print("Collecting raise")
-        result = game.collect_bets(action, raise_amount)
-    
-    return {"state": game.get_game_state(), "ai_raised": False}
+        game.collect_bets(action, raise_amount)
+    return game.get_game_state()
 
 @eel.expose
 def deal_community_cards(number):
     game.deal_community_cards(number)
     return game.get_game_state()
-
 
 @eel.expose
 def showdown():
