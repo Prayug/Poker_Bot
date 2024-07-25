@@ -75,7 +75,6 @@ class PokerGame:
         self.deal_community_cards(1)
         self.deal_community_cards(1)
 
-
     def simulate_game_postFlop(self, bot_hand, flop_cards):
         bot_wins = 0
         newGame = PokerGame([Player("Alice", 10000), Player("Bob", 10000)], big = 100)  # Temporary game instance for simulation
@@ -157,8 +156,7 @@ class PokerGame:
 
         if hand_strength >= call_threshold:
             return "Call"
-        return "Fold"  # AI folds if the hand strength is below the threshold
-    
+        return "Fold"  # AI folds if the hand strength is below the threshold 
 
     def fold(self):
         if self.winner_paid == False:
@@ -210,9 +208,9 @@ class PokerGame:
         best_hand, hand_type = self.evaluate_hand(cards)
         return best_hand, hand_type
     
-
     def advance_game_stage(self):
         print("advancing to next state")
+        
         if not self.flop_dealt:
             print("dealing flop")
             self.deal_community_cards(3)
@@ -232,6 +230,9 @@ class PokerGame:
             print("skipping")
             if self.winner_paid == False:
                 self.showdown()
+
+        if self.players[1].isRaise:
+            print("ai raised")
 
     def reset_game(self):
         self.deck = Deck()
@@ -264,10 +265,16 @@ class PokerGame:
 
     def deal_cards(self):
         self.current_dealer = (self.current_dealer + 1) % 2 
-        for player in self.players:
-            player.setCards(self.deck.deal())
-        for player in self.players:
-            player.setCards(self.deck.deal())
+        self.players[0].setCards(self.deck.deal())
+        print(self.players[0].hand)
+        self.players[1].hand = [Card(Suit["DIAMONDS"], Value["ACE"]), Card(Suit["CLUBS"], Value["ACE"])]
+        self.deck.remove(Card(Suit["DIAMONDS"], Value["ACE"]))
+        self.deck.remove(Card(Suit["CLUBS"], Value["ACE"]))
+        self.players[0].setCards(self.deck.deal())
+        # for player in self.players:
+        #     player.setCards(self.deck.deal())
+        # for player in self.players:
+        #     player.setCards(self.deck.deal())
         print(self.players[1].hand)
 
 
@@ -307,6 +314,7 @@ class PokerGame:
                     self.players[1].isRaise = True
                     self.player_raise(self.players[1], 3 * self.big_blind)
                     self.log.append("AI raises.")
+                    self.advance_game_stage()
                 else:
                     self.log.append("AI checks.")
                     self.advance_game_stage()
@@ -318,7 +326,9 @@ class PokerGame:
                     print("AI wants to raise")
                     self.players[1].isRaise = True
                     self.player_raise(self.players[1], 3*self.big_blind)
+                    self.advance_game_stage()
                 elif self.players[1].make_decision_pre() == "Call":
+                    self.advance_game_stage()
                     print("AI wants to call")
                 else:
                     self.advance_game_stage()
@@ -326,8 +336,6 @@ class PokerGame:
 
                 return self.get_game_state()
                 
-            self.advance_game_stage()
-
         elif player_action == "raise" and raise_amount is not None:
             
             if self.river_dealt:

@@ -51,6 +51,7 @@ async function collectBets(action, raise_amount = null) {
                 showMessage("AI folded. You win the round.");
                 enableButton("play-next-round-button");
             }
+            return response;
         } else if (action === "check") {
             response = await eel.collect_bets(action)();
             updateBestHand(response);
@@ -60,6 +61,7 @@ async function collectBets(action, raise_amount = null) {
             if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
                 enableButton("play-next-round-button");
             }
+            return response;
         }
     } catch (error) {
         console.error(error);
@@ -67,7 +69,12 @@ async function collectBets(action, raise_amount = null) {
 }
 
 async function handleCheckClick() {
-    await collectBets("check");
+    const response = await collectBets("check");
+    
+    console.log(response)
+    if(response.state.player2.isRaise == True){
+        console.log("WE DID IT")
+    }
 }
 
 async function handleRaiseClick() {
