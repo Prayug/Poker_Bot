@@ -528,7 +528,6 @@ def main():
     player2 = Player("Bob", 10000)
     game = PokerGame([player1, player2], big = 100)
     game.play_round()
-
-
+    
 if __name__ == "__main__":
     main()
