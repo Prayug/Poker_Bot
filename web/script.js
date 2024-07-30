@@ -47,6 +47,7 @@ async function collectBets(action, raise_amount = null) {
             
             if(response.player2.isFold == false){
                 // Allow the AI to take its action
+                console.log(response.state["player2"].chips)
                 response = await eel.collect_bets("ai_action")();
                 updateUI(response);
             } else {
@@ -74,6 +75,16 @@ async function collectBets(action, raise_amount = null) {
                 }
             }
             return response;
+        } else if (action === "call"){
+            response = await eel.collect_bets("check")();
+            updateBestHand(response);
+            updateUI(response);
+            showMessage("Call");
+
+            if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
+                enableButton("play-next-round-button");
+            }
+            return;
         }
     } catch (error) {
         console.error(error);
@@ -81,7 +92,7 @@ async function collectBets(action, raise_amount = null) {
 }
 
 async function handleCallClick() {
-    const response = await collectBets("call");
+    const response = await collectBets("raise", 300);
     updateUI(response);
     hideRaiseInput();
 }

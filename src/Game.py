@@ -292,11 +292,14 @@ class PokerGame:
             self.river_dealt = True
 
     def collect_bets(self, player_action, raise_amount=None):        
+        
         if player_action == "check":
             if not self.flop_dealt and self.players[0].current_bet == self.small_blind:
                 self.players[0].chips -= (self.big_blind - self.small_blind)
                 self.pot += (self.big_blind - self.small_blind)
                 self.players[0].current_bet = self.big_blind
+
+            print(self.players[1].chips)
 
             if not self.flop_dealt and self.players[1].current_bet == self.small_blind:
                 self.players[1].chips -= (self.big_blind - self.small_blind)
@@ -320,7 +323,7 @@ class PokerGame:
                 else:
                     self.log.append("AI checks.")
                     self.advance_game_stage()
-                    
+                print(self.players[1].chips)
                 return self.get_game_state()            
             else:
                 print("check preflop")
@@ -336,10 +339,11 @@ class PokerGame:
                     self.advance_game_stage()
                     print("AI wants to fold")
 
+                print(self.players[1].chips)
                 return self.get_game_state()
                 
         elif player_action == "raise" and raise_amount is not None:
-            
+            print(self.players[1].chips)
             if self.river_dealt:
                 print("raise on river")
             elif self.turn_dealt:
@@ -375,7 +379,9 @@ class PokerGame:
                 self.pot = 0
                 self.log.append(f"{self.players[0].name} wins the pot.")
                 self.winner_paid = True
-            
+
+            print(self.players[1].chips)
+
         return self.get_game_state()
 
     def play_round(self):

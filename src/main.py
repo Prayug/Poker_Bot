@@ -40,10 +40,15 @@ def get_best_hand():
 @eel.expose
 def collect_bets(action, raise_amount=None):
     if action == "check":
+        print(game.players[1].chips)
         game.collect_bets(action)
+        print(game.players[1].chips)
     elif action == "raise" and raise_amount is not None:
+        print(game.players[1].chips)
         game.collect_bets(action, raise_amount)
+        print(game.players[1].chips)
     elif action == "ai_action":
+        print(game.players[1].chips)
         if game.players[1].isRaise:
             ai_decision = game.players[1].make_decision_pre()
             if ai_decision == "Call":
@@ -58,6 +63,8 @@ def collect_bets(action, raise_amount=None):
                 game.pot = 0
                 game.log.append(f"{game.players[0].name} wins the pot.")
                 game.winner_paid = True
+        print(game.players[1].chips)
+
     return game.get_game_state()
 
 @eel.expose
