@@ -10,6 +10,7 @@ async function initializeGame() {
         if (response.player1.hand.length > 0) {
             disableButton("deal-cards-button");
         }
+        disableButton("call-button"); // Disable call button initially
     } catch (error) {
         console.error(error);
     }
@@ -42,10 +43,11 @@ async function collectBets(action, raise_amount = null) {
             response = await eel.collect_bets(action, raise_amount)();
             updateBestHand(response);
             updateUI(response);
-            showMessage(`You raised ${raise_amount}. AI calls.`);
+            showMessage(`You raised ${raise_amount}.`);
             
             if(response.player2.isFold == false){
-                response = await eel.collect_bets("check")();
+                // Allow the AI to take its action
+                response = await eel.collect_bets("ai_action")();
                 updateUI(response);
             } else {
                 showMessage("AI folded. You win the round.");
@@ -54,18 +56,34 @@ async function collectBets(action, raise_amount = null) {
             return response;
         } else if (action === "check") {
             response = await eel.collect_bets(action)();
-            updateBestHand(response);
-            updateUI(response);
-            showMessage("Check");
+            
+            if(response["player2"].isRaise){
+                showMessage("AI wants to raise. Do you want to call, raise, or fold?");
+                // Disable all buttons except call, raise, and fold
+                disableButton("check-button");
+                enableButton("raise-button");
+                enableButton("fold-button");
+                enableButton("call-button"); // Assuming there's a call button
+            } else {
+                updateBestHand(response);
+                updateUI(response);
+                showMessage("Check");
 
-            if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
-                enableButton("play-next-round-button");
+                if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
+                    enableButton("play-next-round-button");
+                }
             }
             return response;
         }
     } catch (error) {
         console.error(error);
     }
+}
+
+async function handleCallClick() {
+    const response = await collectBets("call");
+    updateUI(response);
+    hideRaiseInput();
 }
 
 async function handleCheckClick() {

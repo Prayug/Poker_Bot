@@ -35,12 +35,29 @@ def get_best_hand():
         "hand_type": hand_type
     }
 
+
+
 @eel.expose
 def collect_bets(action, raise_amount=None):
     if action == "check":
         game.collect_bets(action)
     elif action == "raise" and raise_amount is not None:
         game.collect_bets(action, raise_amount)
+    elif action == "ai_action":
+        if game.players[1].isRaise:
+            ai_decision = game.players[1].make_decision_pre()
+            if ai_decision == "Call":
+                game.ai_call(game.players[1], "raise")
+                game.advance_game_stage()
+            elif ai_decision == "Raise":
+                game.players[1].isRaise = True
+                game.player_raise(game.players[1], 3 * game.big_blind)
+            else:
+                game.players[1].fold_hand()
+                game.players[0].chips += game.pot
+                game.pot = 0
+                game.log.append(f"{game.players[0].name} wins the pot.")
+                game.winner_paid = True
     return game.get_game_state()
 
 @eel.expose

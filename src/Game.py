@@ -19,6 +19,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from Player import Player
 
+#/opt/homebrew/bin/python3 /Users/prayugsigdel/Coding/Poker/Poker_Bot/src/Main.py
+
 class PokerGame:
     def __init__(self, players, big):
         self.deck = Deck()
