@@ -41,10 +41,12 @@ def get_best_hand():
 def collect_bets(action, raise_amount=None):
     if action == "check":
         print(game.players[1].chips)
+        print("check collecting again")
         game.collect_bets(action)
         print(game.players[1].chips)
     elif action == "raise" and raise_amount is not None:
         print(game.players[1].chips)
+        print("raise collecting again")
         game.collect_bets(action, raise_amount)
         print(game.players[1].chips)
     elif action == "ai_action":
