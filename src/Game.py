@@ -294,19 +294,16 @@ class PokerGame:
     def collect_bets(self, player_action, raise_amount=None):        
         print("entering collect bets")
         if player_action == "check":
-            if not self.flop_dealt and self.players[0].current_bet == self.small_blind:
-                self.players[0].chips -= (self.big_blind - self.small_blind)
-                self.pot += (self.big_blind - self.small_blind)
-                self.players[0].current_bet = self.big_blind
-
-            print(self.players[1].chips)
-
-            if not self.flop_dealt and self.players[1].current_bet == self.small_blind:
-                self.players[1].chips -= (self.big_blind - self.small_blind)
-                self.pot += (self.big_blind - self.small_blind)
-                self.players[1].current_bet = self.big_blind
-
-            if self.river_dealt:
+            if self.players[1].isRaise:
+                # AI had raised, so the player needs to call or fold
+                if self.players[0].current_bet < self.highest_bet:
+                    # Automatically call the raise
+                    call_amount = self.highest_bet - self.players[0].current_bet
+                    self.players[0].chips -= call_amount
+                    self.players[0].current_bet += call_amount
+                    self.pot += call_amount
+                self.players[1].isRaise = False
+            elif self.river_dealt:
                 print("check on river")
                 self.showdown()
             elif self.turn_dealt:
@@ -319,69 +316,33 @@ class PokerGame:
                     self.players[1].isRaise = True
                     self.player_raise(self.players[1], 3 * self.big_blind)
                     self.log.append("AI raises.")
-                    self.advance_game_stage()
                 else:
                     self.log.append("AI checks.")
-                    self.advance_game_stage()
-                print(self.players[1].chips)
-                return self.get_game_state()            
+                self.advance_game_stage()
             else:
                 print("check preflop")
                 if self.players[1].make_decision_pre() == "Raise":
-                    print("AI wants to raise")
                     self.players[1].isRaise = True
-                    self.player_raise(self.players[1], 3*self.big_blind)
+                    self.player_raise(self.players[1], 3 * self.big_blind)
                     self.advance_game_stage()
-                elif self.players[1].make_decision_pre() == "Call":
-                    self.advance_game_stage()
-                    print("AI wants to call")
                 else:
                     self.advance_game_stage()
-                    print("AI wants to fold")
 
-                print(self.players[1].chips)
-                return self.get_game_state()
-                
         elif player_action == "raise" and raise_amount is not None:
-            print(self.players[1].chips)
-            if self.river_dealt:
-                print("raise on river")
-            elif self.turn_dealt:
-                print("raise on turn")
-            elif self.flop_dealt:
-                print("raise on flop")
-            else:
-                print("raise preflop")
-
+            print("player raises")
             raise_amount = int(raise_amount)
-            
-            if not self.flop_dealt and self.players[0].current_bet == self.small_blind:
-                self.players[0].chips -= (self.big_blind - self.small_blind)
-                self.pot += (self.big_blind - self.small_blind)
-                self.players[0].current_bet = self.big_blind
-            
-            if not self.flop_dealt and self.players[1].current_bet == self.small_blind:
-                self.players[1].chips -= (self.big_blind - self.small_blind)
-                self.pot += (self.big_blind - self.small_blind)
-                self.players[1].current_bet = self.big_blind
-
             self.player_raise(self.players[0], raise_amount)
-            
             if self.players[1].make_decision_pre() == "Call":
-                self.ai_call(self.players[1], player_action)
+                self.ai_call(self.players[1], "Raise")
             elif self.players[1].make_decision_pre() == "Raise":
                 self.players[1].isRaise = True
                 self.player_raise(self.players[1], 3 * self.big_blind)
-                return self.get_game_state()
             else:
                 self.players[1].fold_hand()
                 self.players[0].chips += self.pot
                 self.pot = 0
                 self.log.append(f"{self.players[0].name} wins the pot.")
                 self.winner_paid = True
-            
-            print("Is this it?")
-            print(self.players[1].chips)
 
         return self.get_game_state()
 
@@ -454,49 +415,20 @@ class PokerGame:
         return (1, values), "High Card"
     
     def player_raise(self, player, raise_amount):
-        raise_amount = player.raise_bet(raise_amount)
-        self.pot += raise_amount
-        self.highest_bet = player.current_bet
-        return raise_amount
+        additional_bet = raise_amount - player.current_bet
+        player.chips -= additional_bet
+        player.current_bet = raise_amount
+        self.pot += additional_bet
+        self.highest_bet = raise_amount
+        return additional_bet
 
 
     def ai_call(self, ai_player, player_action):
-        if isinstance(ai_player, AIPlayerLevel1):
-            call_amount = min(self.highest_bet, ai_player.chips)
-            ai_player.current_bet = call_amount
-            ai_player.chips -= call_amount
-            self.pot += call_amount
-            return call_amount
-        elif isinstance(ai_player, AIPlayerLevel2):            
-            if self.turn_dealt:
-                if self.make_decision_turn(self.players[1].hand, self.community_cards) == "Call":
-                    call_amount = min(self.highest_bet, ai_player.chips)
-                    ai_player.current_bet = call_amount
-                    ai_player.chips -= call_amount
-                    self.pot += call_amount
-                    return call_amount
-                else:
-                    self.players[1].fold_hand()
-            elif self.flop_dealt:
-                if self.make_decision_flop(self.players[1].hand, self.community_cards, player_action) == "Call":
-                    call_amount = min(self.highest_bet, ai_player.chips)
-                    ai_player.current_bet = call_amount
-                    ai_player.chips -= call_amount
-                    self.pot += call_amount
-                    return call_amount
-                else:
-                    self.players[1].fold_hand()
-            else:
-                if ai_player.make_decision_pre() == "Raise":
-                    self.player_raise(ai_player, 3 * self.big_blind)
-                elif ai_player.make_decision_pre() == "Call":
-                    call_amount = min(self.highest_bet, ai_player.chips)
-                    ai_player.current_bet = call_amount
-                    ai_player.chips -= call_amount
-                    self.pot += call_amount
-                    return call_amount
-                else:
-                    self.players[1].fold_hand()
+        call_amount = min(self.highest_bet - ai_player.current_bet, ai_player.chips)
+        ai_player.current_bet += call_amount
+        ai_player.chips -= call_amount
+        self.pot += call_amount
+        return call_amount
             
 
     def both_check(self):
