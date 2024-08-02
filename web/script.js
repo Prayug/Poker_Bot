@@ -25,7 +25,7 @@ async function dealCards() {
         let response = await eel.deal_cards()();
         updateUI(response);
         showBlinds();
-        enableButton("check-button");        
+        enableButton("check-button");
         updateBestHand(response);
     } catch (error) {
         console.error(error);
@@ -44,8 +44,8 @@ async function collectBets(action, raise_amount = null) {
             updateBestHand(response);
             updateUI(response);
             showMessage(`You raised ${raise_amount}.`);
-            
-            if(response.player2.isFold == false){
+
+            if (response.player2.isFold == false) {
                 // Allow the AI to take its action
                 console.log(response.state["player2"].chips)
                 response = await eel.collect_bets("ai_action")();
@@ -57,8 +57,8 @@ async function collectBets(action, raise_amount = null) {
             return response;
         } else if (action === "check") {
             response = await eel.collect_bets(action)();
-            
-            if(response["player2"].isRaise){
+
+            if (response["player2"].isRaise) {
                 showMessage("AI wants to raise. Do you want to call, raise, or fold?");
                 // Disable all buttons except call, raise, and fold
                 disableButton("check-button");
@@ -71,15 +71,27 @@ async function collectBets(action, raise_amount = null) {
                 showMessage("Check");
 
                 if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
+                    enableButton("check-button");
+                    enableButton("raise-button");
+                    enableButton("fold-button");
+                }
+
+                if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
                     enableButton("play-next-round-button");
                 }
             }
             return response;
-        } else if (action === "call"){
+        } else if (action === "call") {
             response = await eel.collect_bets("check")();
             updateBestHand(response);
             updateUI(response);
             showMessage("Call");
+
+            if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
+                enableButton("check-button");
+                enableButton("raise-button");
+                enableButton("fold-button");
+            }
 
             if (response.log.includes("Dealing Flop") || response.log.includes("Dealing Turn") || response.log.includes("Dealing River")) {
                 enableButton("play-next-round-button");
@@ -99,9 +111,9 @@ async function handleCallClick() {
 
 async function handleCheckClick() {
     const response = await collectBets("check");
-    
+
     console.log(response)
-    if(response.state.player2.isRaise == True){
+    if (response.state.player2.isRaise == true) {
         console.log("WE DID IT")
     }
 }
@@ -136,7 +148,7 @@ async function handleFoldClick() {
         updateUI(response);
         hideBlinds();
         showMessage("You folded. AI wins the round.");
-        
+
         // Disable all action buttons except "Play Next Round"
         disableButton("deal-cards-button");
         disableButton("check-button");
@@ -146,7 +158,7 @@ async function handleFoldClick() {
     } catch (error) {
         console.error(error);
     }
-}   
+}
 
 function updateUI(response) {
     document.getElementById("player1-name").innerText = response.player1.name;
@@ -173,16 +185,15 @@ function updateUI(response) {
     if (response.player2.isFold) {
         disableButton("check-button");
         disableButton("raise-button");
-        disableButton("fold-button");    
+        disableButton("fold-button");
     }
 }
-
 
 function updateBlinds(currentDealer) {
     const player1Blind = document.getElementById("player1-blind");
     const player2Blind = document.getElementById("player2-blind");
 
-    if (currentDealer === 0) { 
+    if (currentDealer === 0) {
         player1Blind.classList.add('big-blind');
         player1Blind.classList.remove('small-blind');
         player1Blind.style.display = 'inline-block';
@@ -190,7 +201,7 @@ function updateBlinds(currentDealer) {
         player2Blind.classList.add('small-blind');
         player2Blind.classList.remove('big-blind');
         player2Blind.style.display = 'inline-block';
-    } else { 
+    } else {
         player1Blind.classList.add('small-blind');
         player1Blind.classList.remove('big-blind');
         player1Blind.style.display = 'inline-block';
@@ -249,7 +260,7 @@ function showMessage(text) {
         messageDiv.style.opacity = 0;
         setTimeout(() => {
             messageDiv.style.display = "none";
-        }, 1000); 
+        }, 1000);
     }, 750);
 }
 
@@ -267,7 +278,6 @@ function hideBestHand() {
     const best_hand_container = document.getElementById("player1-best-hand");
     best_hand_container.style.display = "none";
 }
-
 
 function updateBestHand(response) {
     const player1BestHandElement = document.getElementById("player1-best-hand");
