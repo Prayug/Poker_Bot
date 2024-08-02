@@ -10,7 +10,7 @@ async function initializeGame() {
         if (response.player1.hand.length > 0) {
             disableButton("deal-cards-button");
         }
-        disableButton("call-button"); // Disable call button initially
+        disableButton("call-button");
     } catch (error) {
         console.error(error);
     }
@@ -46,7 +46,6 @@ async function collectBets(action, raise_amount = null) {
             showMessage(`You raised ${raise_amount}.`);
 
             if (response.player2.isFold == false) {
-                // Allow the AI to take its action
                 console.log(response.state["player2"].chips)
                 response = await eel.collect_bets("ai_action")();
                 updateUI(response);
@@ -60,11 +59,10 @@ async function collectBets(action, raise_amount = null) {
 
             if (response["player2"].isRaise) {
                 showMessage("AI wants to raise. Do you want to call, raise, or fold?");
-                // Disable all buttons except call, raise, and fold
                 disableButton("check-button");
                 enableButton("raise-button");
                 enableButton("fold-button");
-                enableButton("call-button"); // Assuming there's a call button
+                enableButton("call-button");
             } else {
                 updateBestHand(response);
                 updateUI(response);
@@ -149,7 +147,6 @@ async function handleFoldClick() {
         hideBlinds();
         showMessage("You folded. AI wins the round.");
 
-        // Disable all action buttons except "Play Next Round"
         disableButton("deal-cards-button");
         disableButton("check-button");
         disableButton("raise-button");
@@ -171,14 +168,11 @@ function updateUI(response) {
 
     updateCommunityCards(response);
 
-    // Update pot and bets information
     document.getElementById("pot").innerText = `Pot: ${response.pot}`;
     document.getElementById("highest-bet").innerText = `Highest Bet: ${response.highest_bet}`;
 
-    // Update blinds and dealer information
     updateBlinds(response.current_dealer);
 
-    // Enable Play Next Round button if the game is in showdown state
     if (response.is_showdown) {
         enableButton("play-next-round-button");
     }
