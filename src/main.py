@@ -35,8 +35,6 @@ def get_best_hand():
         "hand_type": hand_type
     }
 
-
-
 @eel.expose
 def collect_bets(action, raise_amount=None):
     if action == "check":
