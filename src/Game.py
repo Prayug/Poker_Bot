@@ -1,7 +1,3 @@
-# possible additional ideas
-# GUI stuff
-# Multiplayer
-# AI players
 import eel
 from itertools import combinations
 import sys
@@ -79,7 +75,7 @@ class PokerGame:
 
     def simulate_game_postFlop(self, bot_hand, flop_cards):
         bot_wins = 0
-        newGame = PokerGame([Player("Alice", 10000), Player("Bob", 10000)], big = 100)  # Temporary game instance for simulation
+        newGame = PokerGame([Player("Alice", 10000), Player("Bob", 10000)], big = 100) 
 
         for _ in range(1000):
             newGame.reset_game()
@@ -107,7 +103,7 @@ class PokerGame:
 
     def simulate_game_postTurn(self, bot_hand, comm_cards):
         bot_wins = 0
-        newGame = PokerGame([Player("Alice", 10000), Player("Bob", 10000)], big = 100)  # Temporary game instance for simulation
+        newGame = PokerGame([Player("Alice", 10000), Player("Bob", 10000)], big = 100) 
 
         for _ in range(1000):
             newGame.reset_game()
@@ -135,8 +131,7 @@ class PokerGame:
 
         print(hand_strength)
 
-        # Decision threshold based on win rate
-        call_threshold = 50  # Example threshold, can be adjusted
+        call_threshold = 50  
 
         if player1Resp == "Raise":
             if hand_strength >= call_threshold + 5:
@@ -146,19 +141,18 @@ class PokerGame:
                 self.players[1].isRaise = True
                 return "Raise"
             return "Call"
-        return "Fold"  # AI folds if the hand strength is below the threshold
+        return "Fold" 
     
     def make_decision_turn(self, bot_hand, comm_cards):        
         hand_strength = self.simulate_game_postTurn(bot_hand, comm_cards)
 
         print(hand_strength)
 
-        # Decision threshold based on win rate
-        call_threshold = 50  # Example threshold, can be adjusted
+        call_threshold = 50  
 
         if hand_strength >= call_threshold:
             return "Call"
-        return "Fold"  # AI folds if the hand strength is below the threshold 
+        return "Fold" 
 
     def fold(self):
         if self.winner_paid == False:
@@ -252,12 +246,12 @@ class PokerGame:
         self.log = []
 
     def collect_blinds(self):
-        if self.current_dealer == 0:  # Player1 is the dealer
+        if self.current_dealer == 0:
             self.players[1].chips -= self.small_blind
             self.players[0].chips -= self.big_blind
             self.players[1].current_bet = self.small_blind
             self.players[0].current_bet = self.big_blind
-        else:  # Player2 (AI) is the dealer
+        else:  
             self.players[0].chips -= self.small_blind
             self.players[1].chips -= self.big_blind
             self.players[0].current_bet = self.small_blind
@@ -295,9 +289,7 @@ class PokerGame:
         print("entering collect bets")
         if player_action == "check":
             if self.players[1].isRaise:
-                # AI had raised, so the player needs to call or fold
                 if self.players[0].current_bet < self.highest_bet:
-                    # Automatically call the raise
                     call_amount = self.highest_bet - self.players[0].current_bet
                     self.players[0].chips -= call_amount
                     self.players[0].current_bet += call_amount
