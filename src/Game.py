@@ -128,7 +128,6 @@ class PokerGame:
 
     def make_decision_flop(self, bot_hand, flop_cards, player1Resp):        
         hand_strength = self.simulate_game_postFlop(bot_hand, flop_cards)
-
         print(hand_strength)
 
         call_threshold = 50  
