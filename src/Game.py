@@ -284,8 +284,9 @@ class PokerGame:
             self.community_cards.append(self.deck.deal())
             self.river_dealt = True
 
-    def collect_bets(self, player_action, raise_amount=None):        
+    def collect_bets(self, player_action, raise_amount=None):
         print("entering collect bets")
+        print(self.flop_dealt)
         if player_action == "check":
             if self.players[1].isRaise:
                 if self.players[0].current_bet < self.highest_bet:
@@ -318,7 +319,6 @@ class PokerGame:
                     self.advance_game_stage()
                 else:
                     self.advance_game_stage()
-
         elif player_action == "raise" and raise_amount is not None:
             print("player raises")
             raise_amount = int(raise_amount)
@@ -424,11 +424,17 @@ class PokerGame:
 
     def both_check(self):
         if not self.flop_dealt:
+            print("Dealing Flop")
             self.deal_community_cards(3)
+            print("Finish dealing Flop")
         elif not self.turn_dealt:
+            print("Dealing Turn")
             self.deal_community_cards(1)
+            print("Finish dealing Turn")
         elif not self.river_dealt:
+            print("Dealing River")
             self.deal_community_cards(1)
+            print("Finish dealing River")
         else:
             self.showdown()
 

@@ -109,11 +109,6 @@ async function handleCallClick() {
 
 async function handleCheckClick() {
     const response = await collectBets("check");
-
-    console.log(response)
-    if (response.state.player2.isRaise == true) {
-        console.log("WE DID IT")
-    }
 }
 
 async function handleRaiseClick() {

@@ -38,10 +38,18 @@ def get_best_hand():
 @eel.expose
 def collect_bets(action, raise_amount=None):
     if action == "check":
-        print(game.players[1].chips)
-        print("check collecting again")
-        game.collect_bets(action)
-        print(game.players[1].chips)
+        if not preflop:
+            print(game.players[1].chips)
+            print("check collecting again")
+            game.collect_bets(action)
+            print(game.players[1].chips)
+        else:
+            print("check preflop")
+            ai_decision = game.players[1].make_decision_pre()
+            if ai_decision == "Raise":
+                game.players[1].isRaise = True
+                game.player_raise(game.players[1], 3 * game.big_blind)
+            game.advance_game_stage()
     elif action == "raise" and raise_amount is not None:
         print(game.players[1].chips)
         print("raise collecting again")
@@ -66,6 +74,7 @@ def collect_bets(action, raise_amount=None):
         print(game.players[1].chips)
 
     return game.get_game_state()
+
 
 @eel.expose
 def deal_community_cards(number):
