@@ -55,6 +55,7 @@ def collect_bets(action, raise_amount=None):
         print("raise collecting again")
         game.collect_bets(action, raise_amount)
         print(game.players[1].chips)
+        game.advance_game_stage()
     elif action == "ai_action":
         print(game.players[1].chips)
         if game.players[1].isRaise:
