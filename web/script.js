@@ -11,6 +11,9 @@ async function initializeGame() {
             disableButton("deal-cards-button");
         }
         disableButton("call-button");
+        disableButton("check-button");
+        disableButton("fold-button");
+        disableButton("raise-button");
     } catch (error) {
         console.error(error);
     }
@@ -34,9 +37,9 @@ async function dealCards() {
 }
 
 async function collectBets(action, raise_amount = null) {
+    let response;
     try {
-        let response;
-        if (action === "raise") {
+        if (action === "raise")  {
             if (raise_amount === null || raise_amount < 0) {
                 return;
             }
@@ -47,7 +50,7 @@ async function collectBets(action, raise_amount = null) {
 
             if (response.player2.isFold == false) {
                 console.log(response.state["player2"].chips)
-                response = await eel.collect_bets("ai_action")();
+                response = await eel.collect_bets("check")();
                 updateUI(response);
             } else {
                 showMessage("AI folded. You win the round.");
@@ -98,6 +101,12 @@ async function collectBets(action, raise_amount = null) {
         }
     } catch (error) {
         console.error(error);
+    }
+
+    if (response["player2"].isRaise){
+        enableButton("check-button");
+        enableButton("raise-button");
+        enableButton("fold-button");
     }
 }
 

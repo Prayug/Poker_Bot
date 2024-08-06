@@ -260,16 +260,16 @@ class PokerGame:
 
     def deal_cards(self):
         self.current_dealer = (self.current_dealer + 1) % 2 
-        self.players[0].setCards(self.deck.deal())
-        print(self.players[0].hand)
-        self.players[1].hand = [Card(Suit["DIAMONDS"], Value["ACE"]), Card(Suit["CLUBS"], Value["ACE"])]
-        self.deck.remove(Card(Suit["DIAMONDS"], Value["ACE"]))
-        self.deck.remove(Card(Suit["CLUBS"], Value["ACE"]))
-        self.players[0].setCards(self.deck.deal())
-        # for player in self.players:
-        #     player.setCards(self.deck.deal())
-        # for player in self.players:
-        #     player.setCards(self.deck.deal())
+        # self.players[0].setCards(self.deck.deal())
+        # print(self.players[0].hand)
+        # self.players[1].hand = [Card(Suit["DIAMONDS"], Value["ACE"]), Card(Suit["CLUBS"], Value["ACE"])]
+        # self.deck.remove(Card(Suit["DIAMONDS"], Value["ACE"]))
+        # self.deck.remove(Card(Suit["CLUBS"], Value["ACE"]))
+        # self.players[0].setCards(self.deck.deal())
+        for player in self.players:
+            player.setCards(self.deck.deal())
+        for player in self.players:
+            player.setCards(self.deck.deal())
         print(self.players[1].hand)
 
 
@@ -327,7 +327,7 @@ class PokerGame:
                 self.ai_call(self.players[1], "Raise")
             elif self.players[1].make_decision_pre() == "Raise":
                 self.players[1].isRaise = True
-                self.player_raise(self.players[1], 3 * self.big_blind)
+                self.player_raise(self.players[1], raise_amount)
             else:
                 self.players[1].fold_hand()
                 self.players[0].chips += self.pot
