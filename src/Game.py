@@ -335,9 +335,11 @@ class PokerGame:
             if ai_decision == "Call":
                 self.ai_call(self.players[1], "Raise")
             elif ai_decision == "Raise":
+                
                 self.players[1].isRaise = True
                 self.player_raise(self.players[1], raise_amount)
             else:
+            
                 self.players[1].fold_hand()
                 self.players[0].chips += self.pot
                 self.pot = 0
