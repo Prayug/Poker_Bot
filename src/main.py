@@ -49,7 +49,8 @@ def collect_bets(action, raise_amount=None):
             if ai_decision == "Raise":
                 game.players[1].isRaise = True
                 game.player_raise(game.players[1], 3 * game.big_blind)
-            game.advance_game_stage()
+            elif ai_decision == "Call" or ai_decision == "fold":
+                game.collect_bets("check")
     elif action == "raise" and raise_amount is not None:
         print(game.players[1].chips)
         print("raise collecting again")

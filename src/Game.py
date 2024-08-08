@@ -128,7 +128,7 @@ class PokerGame:
 
     def make_decision_flop(self, bot_hand, flop_cards, player1Resp):        
         hand_strength = self.simulate_game_postFlop(bot_hand, flop_cards)
-        print("Flop Hand Strength: ")
+        print("Flop Hand Strength:")
         print(hand_strength)
 
         call_threshold = 50  
@@ -288,7 +288,15 @@ class PokerGame:
     def collect_bets(self, player_action, raise_amount=None):
         print("entering collect bets")
         print(self.flop_dealt)
+        
         if player_action == "check":
+            print("Current bet.")
+            print(self.players[0].current_bet)
+            if self.players[0].current_bet == 50:  # Subtract the big blind from the player's stack on the first check
+                self.players[0].chips -= self.big_blind
+                print("My chips: ")
+                print(self.players[0].chips)
+                self.pot += self.big_blind
             if self.players[1].isRaise:
                 if self.players[0].current_bet < self.highest_bet:
                     call_amount = self.highest_bet - self.players[0].current_bet
@@ -324,30 +332,18 @@ class PokerGame:
             print("player raises")
             raise_amount = int(raise_amount)
             self.player_raise(self.players[0], raise_amount)
-            
-            if self.flop_dealt:
-                ai_decision = self.make_decision_flop(self.players[1].hand, self.community_cards, "Raise")
-            elif self.turn_dealt:
-                ai_decision = self.make_decision_turn(self.players[1].hand, self.community_cards)
-            else:
-                ai_decision = self.players[1].make_decision_pre()
-            
-            if ai_decision == "Call":
+            if self.players[1].make_decision_pre() == "Call":
                 self.ai_call(self.players[1], "Raise")
-            elif ai_decision == "Raise":
-                
+            elif self.players[1].make_decision_pre() == "Raise":
                 self.players[1].isRaise = True
                 self.player_raise(self.players[1], raise_amount)
             else:
-            
                 self.players[1].fold_hand()
                 self.players[0].chips += self.pot
                 self.pot = 0
                 self.log.append(f"{self.players[0].name} wins the pot.")
                 self.winner_paid = True
-                
-                
-            
+
         return self.get_game_state()
 
     def play_round(self):
