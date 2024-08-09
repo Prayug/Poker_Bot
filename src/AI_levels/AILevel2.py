@@ -63,13 +63,13 @@ class AIPlayerLevel2(Player):
         call_threshold = 45  # Example threshold, can be adjusted
         raise_threshold = 55
 
-        if hand_strength >= raise_threshold:
-            print("Raise")
-            return "Raise"
-        elif hand_strength >= call_threshold:
-            print("Call")
-            return "Call"
-        print("Fold")
-        return "Fold"  # AI folds if the hand strength is below the threshold
+        # if hand_strength >= raise_threshold:
+        #     print("Raise")
+        #     return "Raise"
+        # elif hand_strength >= call_threshold:
+        #     print("Call")
+        #     return "Call"
+        # print("Fold")
+        return hand_strength  # AI folds if the hand strength is below the threshold
     
  

@@ -131,17 +131,17 @@ class PokerGame:
         print("Flop Hand Strength:")
         print(hand_strength)
 
-        call_threshold = 50  
+        # call_threshold = 50  
 
-        if player1Resp == "Raise":
-            if hand_strength >= call_threshold + 5:
-                return "Call"
-        if player1Resp == "Check":
-            if hand_strength >= call_threshold + 5:
-                self.players[1].isRaise = True
-                return "Raise"
-            return "Call"
-        return "Fold" 
+        # if player1Resp == "Raise":
+        #     if hand_strength >= call_threshold + 5:
+        #         return "Call"
+        # if player1Resp == "Check":
+        #     if hand_strength >= call_threshold + 5:
+        #         self.players[1].isRaise = True
+        #         return "Raise"
+        #     return "Call"
+        return hand_strength 
     
     def make_decision_turn(self, bot_hand, comm_cards):        
         hand_strength = self.simulate_game_postTurn(bot_hand, comm_cards)
@@ -312,8 +312,7 @@ class PokerGame:
                 self.advance_game_stage()
             elif self.flop_dealt:
                 print("check on flop")
-                ai_decision = self.make_decision_flop(self.players[1].hand, self.community_cards, "Check")
-                if ai_decision == "Raise":
+                if ai_decision >= 60:
                     self.players[1].isRaise = True
                     self.player_raise(self.players[1], 3 * self.big_blind)
                     self.log.append("AI raises.")
@@ -322,7 +321,7 @@ class PokerGame:
                 self.advance_game_stage()
             else:
                 print("check preflop")
-                if self.players[1].make_decision_pre() == "Raise":
+                if self.players[1].make_decision_pre() >= 55:
                     self.players[1].isRaise = True
                     self.player_raise(self.players[1], 3 * self.big_blind)
                     self.advance_game_stage()
@@ -332,17 +331,35 @@ class PokerGame:
             print("player raises")
             raise_amount = int(raise_amount)
             self.player_raise(self.players[0], raise_amount)
-            if self.players[1].make_decision_pre() == "Call":
-                self.ai_call(self.players[1], "Raise")
-            elif self.players[1].make_decision_pre() == "Raise":
-                self.players[1].isRaise = True
-                self.player_raise(self.players[1], raise_amount)
+            
+            if self.river_dealt:
+                print("Raise on river")
+            elif self.turn_dealt:
+                print("Raise on turn")
+            elif self.flop_dealt:
+                print("Raise on flop")
+                ai_decision = self.make_decision_flop(self.players[1].hand, self.community_cards, "Check")
+                if ai_decision >= 60:
+                    self.players[1].isRaise = True
+                    self.player_raise(self.players[1], 3 * self.big_blind)
+                    self.log.append("AI raises.")
+                else:
+                    self.log.append("AI checks.")
+                self.advance_game_stage()
             else:
-                self.players[1].fold_hand()
-                self.players[0].chips += self.pot
-                self.pot = 0
-                self.log.append(f"{self.players[0].name} wins the pot.")
-                self.winner_paid = True
+                print("Raise preflop")
+                if self.players[1].make_decision_pre() >= 45:
+                    self.ai_call(self.players[1], "Raise")
+                elif self.players[1].make_decision_pre() >= 55:
+                    self.players[1].isRaise = True
+                    self.player_raise(self.players[1], raise_amount)
+                else:
+                    self.players[1].fold_hand()
+                    self.players[0].chips += self.pot
+                    self.pot = 0
+                    self.log.append(f"{self.players[0].name} wins the pot.")
+                    self.winner_paid = True
+
 
         return self.get_game_state()
 

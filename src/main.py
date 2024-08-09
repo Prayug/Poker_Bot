@@ -46,10 +46,10 @@ def collect_bets(action, raise_amount=None):
         else:
             print("check preflop")
             ai_decision = game.players[1].make_decision_pre()
-            if ai_decision == "Raise":
+            if ai_decision >= 55:
                 game.players[1].isRaise = True
                 game.player_raise(game.players[1], 3 * game.big_blind)
-            elif ai_decision == "Call" or ai_decision == "fold":
+            else:
                 game.collect_bets("check")
     elif action == "raise" and raise_amount is not None:
         print(game.players[1].chips)
@@ -61,10 +61,10 @@ def collect_bets(action, raise_amount=None):
         print(game.players[1].chips)
         if game.players[1].isRaise:
             ai_decision = game.players[1].make_decision_pre()
-            if ai_decision == "Call":
+            if ai_decision >= 45 and ai_decision < 55:
                 game.ai_call(game.players[1], "raise")
                 game.advance_game_stage()
-            elif ai_decision == "Raise":
+            elif ai_decision <= 55:
                 game.players[1].isRaise = True
                 game.player_raise(game.players[1], 3 * game.big_blind)
             else:
